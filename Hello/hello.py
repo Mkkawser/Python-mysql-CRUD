@@ -1,52 +1,55 @@
-from csv import DictReader, reader
-from math import dist
-from os import curdir
-from turtle import update
 import mysql.connector
-mydb = mysql.connector.connect(
-    host="localhost",
-    user="root",
-    port="3306",
-    password="admin",
-    database="testdb"
-)
 
 
-def Create():
-    q = 'create table if not exists user(userId int primary key, userName varchar(20), phone varchar(12))'
-    cur = mydb.cursor()
-    cur.execute(q)
-    # print(cur)
+class MyDB:
+    def __init__(self):
+        self.con = mysql.connector.connect(
+            host="localhost", user="root", password="admin", database="testdb"
+        )
+
+    def showDB(self):
+        cur = self.con.cursor()
+        cur.execute("show databases")
+        for line in cur:
+            print(line)
+
+    def createDB(self):
+        q = 'create database if not exists testdb'
+        cur = self.con.cursor()
+        cur.execute(q)
+
+    def createTable(self):
+        q = 'create table if not exists user(id int primary key,name varchar(55),phone varchar(55))'
+        cur = self.con.cursor()
+        cur.execute(q)
+        self.con.commit()
+
+    def insert(self, id, name, phone):
+        q = 'insert into user values(%s,%s,%s)'
+        val = (id, name, phone)
+        cur = self.con.cursor()
+        cur.execute(q, val)
+        self.con.commit()
+
+    def updateDB(self, i, n, p):
+        q = 'update user set name=%s ,phone=%s where id=%s'
+        val = (n, p, i)
+        cur = self.con.cursor()
+        cur.execute(q, val)
+        self.con.commit()
+
+    def deleteDB(self, i):
+        q = 'delete from user where id=%s'
+        val = (i,)
+        cur = self.con.cursor()
+        cur.execute(q, val)
+        self.con.commit()
 
 
-def Inserting():
-    q = 'insert into user values(1283,"Kawser",017312)'
-    cur = mydb.cursor()
-    cur.execute(q)
-    mydb.commit()
-
-
-def showDb():
-    q = 'select * from user'
-    cur = mydb.cursor()
-    cur.execute(q)
-    for line in cur:
-        print(line)
-
-
-def updateDb(id, name):
-    q = "UPDATE user SET userName = %s WHERE userId = %s"  # SQL Injection
-    val = (name, id)
-    cur = mydb.cursor()
-    cur.execute(q, val)
-    mydb.commit()
-
-
-def delete(name):
-    mycursor = mydb.cursor()
-    sql = "DELETE FROM user WHERE userName ='{}'".format(name)
-    mycursor.execute(sql)
-    mydb.commit()
-    print(mycursor.rowcount, "record(s) deleted")
-
-
+DB_ = MyDB()
+# DB_.createDB()
+# DB_.showDB()
+# DB_.createTable()
+# DB_.insert(1285, "MK", "0173")
+# DB_.updateDB(1283, "Kawser", "016311")
+# DB_.deleteDB(1283)
